@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 
 
 # ============================================================
-# CONFIGURATION
+# CONFIG
 # ============================================================
 
 VPNGATE_URL = "https://www.vpngate.net/en/"
@@ -18,19 +18,15 @@ VPNGATE_URL = "https://www.vpngate.net/en/"
 STATE_FILE = Path("data/servers.json")
 OUTPUT_FILE = Path("data/sstp.txt")
 
-# دریافت Batch جدید هر 24 ساعت
 UPDATE_INTERVAL = timedelta(hours=24)
-
-# هر سرور بعد از 23 ساعت و 55 دقیقه منقضی می‌شود
 SERVER_TTL = timedelta(hours=23, minutes=55)
 
-REQUEST_TIMEOUT = 45
+REQUEST_TIMEOUT = 60
 
 HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 "
-        "(KHTML, like Gecko) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/140.0 Safari/537.36"
     )
 }
@@ -44,11 +40,11 @@ def now_utc() -> datetime:
     return datetime.now(timezone.utc)
 
 
-def datetime_to_iso(dt: datetime) -> str:
+def to_iso(dt: datetime) -> str:
     return dt.astimezone(timezone.utc).isoformat()
 
 
-def iso_to_datetime(value: str) -> datetime:
+def from_iso(value: str) -> datetime:
     return datetime.fromisoformat(
         value.replace("Z", "+00:00")
     )
@@ -70,22 +66,21 @@ def load_state() -> dict:
         return default_state()
 
     try:
-        with STATE_FILE.open("r", encoding="utf-8") as file:
-            state = json.load(file)
+        with STATE_FILE.open("r", encoding="utf-8") as f:
+            state = json.load(f)
 
         if not isinstance(state, dict):
             return default_state()
 
-        state.setdefault("last_update", None)
-        state.setdefault("servers", [])
-
-        if not isinstance(state["servers"], list):
+        if not isinstance(state.get("servers"), list):
             state["servers"] = []
+
+        state.setdefault("last_update", None)
 
         return state
 
-    except Exception as exc:
-        print(f"[!] Failed to read state: {exc}")
+    except Exception as e:
+        print(f"[!] Failed to load state: {e}")
         return default_state()
 
 
@@ -95,99 +90,62 @@ def save_state(state: dict) -> None:
         exist_ok=True
     )
 
-    temp_file = STATE_FILE.with_suffix(".tmp")
+    temp = STATE_FILE.with_suffix(".tmp")
 
-    with temp_file.open("w", encoding="utf-8") as file:
+    with temp.open("w", encoding="utf-8") as f:
         json.dump(
             state,
-            file,
+            f,
             ensure_ascii=False,
             indent=2
         )
 
-    temp_file.replace(STATE_FILE)
+    temp.replace(STATE_FILE)
 
 
 # ============================================================
 # HOSTNAME VALIDATION
 # ============================================================
 
-HOSTNAME_PATTERN = re.compile(
-    r"^(?=.{1,253}$)"
-    r"(?:[a-zA-Z0-9]"
-    r"(?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+"
-    r"[a-zA-Z]{2,63}$"
+HOSTNAME_REGEX = re.compile(
+    r"\b[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+"
+    r"(?:\:\d{1,5})?\b"
 )
 
 
-def is_valid_hostname(hostname: str) -> bool:
-    if not hostname:
-        return False
-
-    hostname = hostname.strip().lower()
-
-    # ما IP عددی نمی‌خواهیم
-    if re.fullmatch(
-        r"(?:\d{1,3}\.){3}\d{1,3}",
-        hostname
-    ):
-        return False
-
-    # فقط Hostname های opengw.net
-    if not hostname.endswith(".opengw.net"):
-        return False
-
-    return bool(HOSTNAME_PATTERN.fullmatch(hostname))
-
-
-# ============================================================
-# EXTRACT SSTP HOSTNAME FROM CELL
-# ============================================================
-
-def extract_hostname_from_text(text: str) -> str | None:
-    """
-    مثال:
-
-    SSTP Hostname :
-    vpn294043338.opengw.net:1649
-
-    خروجی:
-
-    vpn294043338.opengw.net
-    """
-
-    if not text:
+def normalize_hostname(value: str) -> str | None:
+    if not value:
         return None
 
-    text = " ".join(text.split())
-
-    # پیدا کردن hostname به همراه پورت اختیاری
-    match = re.search(
-        r"\b[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+"
-        r"(?:\:\d{1,5})?\b",
-        text
-    )
-
-    if not match:
-        return None
-
-    hostname = match.group(0).strip().lower()
+    value = value.strip().lower()
 
     # حذف پورت
-    hostname = hostname.split(":", 1)[0]
+    value = value.split(":", 1)[0]
 
-    if not is_valid_hostname(hostname):
+    # فقط opengw.net
+    if not value.endswith(".opengw.net"):
         return None
 
-    return hostname
+    # جلوگیری از IP
+    if re.fullmatch(
+        r"(?:\d{1,3}\.){3}\d{1,3}",
+        value
+    ):
+        return None
+
+    if len(value) > 253:
+        return None
+
+    return value
 
 
 # ============================================================
 # DOWNLOAD VPN GATE
 # ============================================================
 
-def download_vpngate_page() -> str:
-    print("[+] Downloading VPN Gate server list...")
+def download_vpngate() -> str:
+
+    print("[+] Downloading VPN Gate...")
 
     response = requests.get(
         VPNGATE_URL,
@@ -197,52 +155,11 @@ def download_vpngate_page() -> str:
 
     response.raise_for_status()
 
-    # VPN Gate فعلاً HTML است
-    response.encoding = response.apparent_encoding
+    print(
+        f"[+] HTTP Status: {response.status_code}"
+    )
 
     return response.text
-
-
-# ============================================================
-# FIND MS-SSTP COLUMN
-# ============================================================
-
-def find_sstp_column_indexes(table) -> list[int]:
-    """
-    سعی می‌کند ستون MS-SSTP را از header جدول پیدا کند.
-    """
-
-    rows = table.find_all("tr")
-
-    for row in rows:
-
-        headers = row.find_all(
-            ["th", "td"]
-        )
-
-        if not headers:
-            continue
-
-        for index, cell in enumerate(headers):
-
-            text = cell.get_text(
-                " ",
-                strip=True
-            ).lower()
-
-            normalized = re.sub(
-                r"\s+",
-                " ",
-                text
-            )
-
-            if (
-                "ms-sstp" in normalized
-                or "ms sstp" in normalized
-            ):
-                return [index]
-
-    return []
 
 
 # ============================================================
@@ -256,119 +173,74 @@ def extract_sstp_hostnames(html: str) -> list[str]:
         "html.parser"
     )
 
-    hostnames: set[str] = set()
+    found: set[str] = set()
 
-    tables = soup.find_all("table")
+    rows = soup.find_all("tr")
 
     print(
-        f"[+] HTML tables detected: {len(tables)}"
+        f"[+] Table rows found: {len(rows)}"
     )
 
-    for table in tables:
+    for row in rows:
 
-        rows = table.find_all("tr")
+        text = row.get_text(
+            " ",
+            strip=True
+        )
 
-        if not rows:
+        if not text:
+            continue
+
+        # فقط ردیف‌هایی که واقعاً MS-SSTP دارند
+        if "SSTP Hostname" not in text:
             continue
 
         # ----------------------------------------------------
-        # Try to detect exact MS-SSTP column
+        # پیدا کردن hostname
         # ----------------------------------------------------
 
-        sstp_indexes = find_sstp_column_indexes(
-            table
+        matches = HOSTNAME_REGEX.findall(
+            text
         )
 
-        if sstp_indexes:
+        for match in matches:
 
-            for row in rows:
+            hostname = normalize_hostname(
+                match
+            )
 
-                cells = row.find_all(
-                    ["td", "th"]
+            if hostname:
+                found.add(
+                    hostname
                 )
 
-                for index in sstp_indexes:
-
-                    if index >= len(cells):
-                        continue
-
-                    cell = cells[index]
-
-                    text = cell.get_text(
-                        " ",
-                        strip=True
-                    )
-
-                    hostname = extract_hostname_from_text(
-                        text
-                    )
-
-                    if hostname:
-                        hostnames.add(
-                            hostname
-                        )
-
-        else:
-
-            # ------------------------------------------------
-            # Fallback:
-            # Search only cells containing SSTP Hostname
-            # ------------------------------------------------
-
-            for row in rows:
-
-                cells = row.find_all(
-                    ["td", "th"]
+                print(
+                    f"[+] Found SSTP: {hostname}"
                 )
 
-                for cell in cells:
+    result = sorted(found)
 
-                    text = cell.get_text(
-                        " ",
-                        strip=True
-                    )
-
-                    if not text:
-                        continue
-
-                    lower_text = text.lower()
-
-                    if "sstp hostname" not in lower_text:
-                        continue
-
-                    hostname = extract_hostname_from_text(
-                        text
-                    )
-
-                    if hostname:
-                        hostnames.add(
-                            hostname
-                        )
-
-    result = sorted(hostnames)
-
+    print()
     print(
-        f"[+] MS-SSTP hostnames found: {len(result)}"
+        f"[+] Total unique MS-SSTP hostnames: "
+        f"{len(result)}"
     )
 
     return result
 
 
 # ============================================================
-# EXPIRATION
+# EXPIRE OLD SERVERS
 # ============================================================
 
-def remove_expired_servers(state: dict) -> int:
+def remove_expired(state: dict) -> int:
 
     current = now_utc()
 
-    valid_servers = []
+    alive = []
     removed = 0
 
-    for server in state.get(
-        "servers",
-        []
-    ):
+    for server in state["servers"]:
 
         hostname = server.get(
             "hostname"
@@ -383,15 +255,14 @@ def remove_expired_servers(state: dict) -> int:
             continue
 
         try:
-            added_time = iso_to_datetime(
+            created = from_iso(
                 added_at
             )
-
         except Exception:
             removed += 1
             continue
 
-        age = current - added_time
+        age = current - created
 
         if age >= SERVER_TTL:
 
@@ -403,20 +274,23 @@ def remove_expired_servers(state: dict) -> int:
 
         else:
 
-            valid_servers.append(
-                server
+            alive.append(
+                {
+                    "hostname": hostname,
+                    "added_at": added_at
+                }
             )
 
-    state["servers"] = valid_servers
+    state["servers"] = alive
 
     return removed
 
 
 # ============================================================
-# UPDATE CHECK
+# CHECK 24H UPDATE
 # ============================================================
 
-def should_update(state: dict) -> bool:
+def update_due(state: dict) -> bool:
 
     last_update = state.get(
         "last_update"
@@ -426,52 +300,38 @@ def should_update(state: dict) -> bool:
         return True
 
     try:
-        last_update_time = iso_to_datetime(
+        previous = from_iso(
             last_update
         )
-
     except Exception:
         return True
 
-    elapsed = (
-        now_utc()
-        - last_update_time
-    )
-
-    return elapsed >= UPDATE_INTERVAL
+    return (
+        now_utc() - previous
+    ) >= UPDATE_INTERVAL
 
 
 # ============================================================
-# ADD NEW SERVERS
+# ADD SERVERS
 # ============================================================
 
-def add_new_servers(
+def add_servers(
     state: dict,
     hostnames: list[str]
 ) -> int:
 
     existing = {
-        server.get("hostname")
-        for server in state.get(
-            "servers",
-            []
-        )
+        item.get("hostname")
+        for item in state["servers"]
     }
 
-    timestamp = datetime_to_iso(
+    timestamp = to_iso(
         now_utc()
     )
 
     added = 0
 
     for hostname in hostnames:
-
-        hostname = hostname.strip().lower()
-
-        if not is_valid_hostname(
-            hostname
-        ):
-            continue
 
         if hostname in existing:
             continue
@@ -489,15 +349,11 @@ def add_new_servers(
 
         added += 1
 
-        print(
-            f"[+] Added: {hostname}"
-        )
-
     return added
 
 
 # ============================================================
-# WRITE OUTPUT TXT
+# WRITE TXT
 # ============================================================
 
 def write_output(state: dict) -> None:
@@ -507,56 +363,35 @@ def write_output(state: dict) -> None:
         exist_ok=True
     )
 
-    hostnames = set()
+    hostnames = {
+        item["hostname"]
+        for item in state["servers"]
+        if item.get("hostname")
+    }
 
-    for server in state.get(
-        "servers",
-        []
-    ):
+    hostnames = sorted(hostnames)
 
-        hostname = server.get(
-            "hostname"
-        )
+    temp = OUTPUT_FILE.with_suffix(".tmp")
 
-        if not hostname:
-            continue
-
-        hostname = hostname.strip().lower()
-
-        if is_valid_hostname(
-            hostname
-        ):
-            hostnames.add(
-                hostname
-            )
-
-    sorted_hostnames = sorted(
-        hostnames
-    )
-
-    temp_file = OUTPUT_FILE.with_suffix(
-        ".tmp"
-    )
-
-    with temp_file.open(
+    with temp.open(
         "w",
         encoding="utf-8",
         newline="\n"
-    ) as file:
+    ) as f:
 
-        for hostname in sorted_hostnames:
-            file.write(
+        for hostname in hostnames:
+            f.write(
                 hostname
                 + "\n"
             )
 
-    temp_file.replace(
+    temp.replace(
         OUTPUT_FILE
     )
 
     print(
-        f"[+] Output written: "
-        f"{len(sorted_hostnames)} hosts"
+        f"[+] sstp.txt contains "
+        f"{len(hostnames)} hostnames."
     )
 
 
@@ -568,28 +403,29 @@ def main() -> None:
 
     print()
     print("=" * 60)
-    print(" VPN GATE MS-SSTP COLLECTOR")
+    print("VPN GATE MS-SSTP COLLECTOR")
     print("=" * 60)
+    print()
 
     state = load_state()
 
     # --------------------------------------------------------
-    # 1. Remove expired servers
+    # Remove expired
     # --------------------------------------------------------
 
-    removed = remove_expired_servers(
+    removed = remove_expired(
         state
     )
 
     print(
-        f"[+] Expired removed: {removed}"
+        f"[+] Removed expired: {removed}"
     )
 
     # --------------------------------------------------------
-    # 2. Check 24 hour update
+    # 24-hour update
     # --------------------------------------------------------
 
-    if should_update(state):
+    if update_due(state):
 
         print(
             "[+] 24-hour update is due."
@@ -597,7 +433,7 @@ def main() -> None:
 
         try:
 
-            html = download_vpngate_page()
+            html = download_vpngate()
 
             hostnames = extract_sstp_hostnames(
                 html
@@ -606,16 +442,16 @@ def main() -> None:
             if not hostnames:
 
                 print(
-                    "[!] No MS-SSTP hostname found."
+                    "[!] No SSTP hostnames found."
                 )
 
                 print(
-                    "[!] Existing servers preserved."
+                    "[!] Existing data preserved."
                 )
 
             else:
 
-                added = add_new_servers(
+                added = add_servers(
                     state,
                     hostnames
                 )
@@ -624,50 +460,37 @@ def main() -> None:
                     f"[+] New servers added: {added}"
                 )
 
-                # فقط وقتی دریافت موفق بود
-                # زمان آخرین Update را ثبت می‌کنیم
-                state["last_update"] = (
-                    datetime_to_iso(
-                        now_utc()
-                    )
+                # فقط وقتی دریافت موفق بوده
+                state["last_update"] = to_iso(
+                    now_utc()
                 )
 
-        except requests.RequestException as exc:
+        except Exception as e:
 
             print(
-                f"[!] VPN Gate request failed: {exc}"
+                f"[!] Collection failed: {e}"
             )
 
             print(
-                "[!] Keeping old servers."
-            )
-
-        except Exception as exc:
-
-            print(
-                f"[!] Unexpected error: {exc}"
-            )
-
-            print(
-                "[!] Keeping old servers."
+                "[!] Existing servers preserved."
             )
 
     else:
 
         print(
-            "[=] 24-hour update is not due yet."
+            "[=] 24-hour update not due."
         )
 
     # --------------------------------------------------------
-    # 3. Final expiration cleanup
+    # Final expiration cleanup
     # --------------------------------------------------------
 
-    remove_expired_servers(
+    remove_expired(
         state
     )
 
     # --------------------------------------------------------
-    # 4. Save JSON state
+    # Save
     # --------------------------------------------------------
 
     save_state(
@@ -675,18 +498,19 @@ def main() -> None:
     )
 
     # --------------------------------------------------------
-    # 5. Generate TXT
+    # Output
     # --------------------------------------------------------
 
     write_output(
         state
     )
 
-    print("=" * 60)
+    print()
     print(
         f"[+] Active servers: "
-        f"{len(state.get('servers', []))}"
+        f"{len(state['servers'])}"
     )
+
     print("=" * 60)
 
 
