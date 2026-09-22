@@ -1,4 +1,353 @@
 {
-  "last_update": "2026-09-20T02:35:29.223164+00:00",
-  "servers": []
+  "last_update": "2026-09-22T02:35:19.587999+00:00",
+  "servers": [
+    {
+      "hostname": "laud.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "mswin39.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "n26.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "public-vpn-100.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "public-vpn-139.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "public-vpn-150.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "public-vpn-151.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "public-vpn-152.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "public-vpn-156.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "public-vpn-236.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "public-vpn-261.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "public-vpn-67.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "public-vpn-75.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "public-vpn-78.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "public-vpn-84.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "public-vpn-94.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn114879424.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn118756292.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn122714670.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn123938780.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn124968939.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn137374619.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn140213830.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn150023940.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn162700683.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn164183936.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn165600618.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn192018109.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn193195706.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn225261515.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn231115355.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn271901051.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn301140053.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn302835717.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn307306415.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn320086889.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn339628984.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn355601877.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn370723894.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn382410804.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn383624808.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn384166385.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn384256844.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn411521385.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn413896691.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn423850246.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn436881174.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn440254653.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn481436829.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn492132110.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn501803801.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn507425390.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn554537348.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn556108657.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn594251655.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn597991053.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn603218398.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn608294256.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn630618755.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn658185927.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn662317581.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn693017146.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn699751090.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn722616360.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn738567258.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn745346330.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn759761201.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn764604624.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn771690910.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn783575401.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn787666886.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn788502559.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn802629635.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn805893912.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn824185996.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn827554601.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn832047407.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn836545670.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn849758179.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn878075889.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn883356300.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn898575276.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn942089580.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn945893058.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn958137914.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn978099575.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    },
+    {
+      "hostname": "vpn990898893.opengw.net",
+      "added_at": "2026-09-22T02:35:19.587888+00:00"
+    }
+  ]
 }
